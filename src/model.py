@@ -101,6 +101,16 @@ def generate_price_war_categorie(name):
     products = [Product("A", 10, 0.5, 1), Product("B", 12, 0.7, 1)]
     return ProductsCategorie(name, products)
 
+def History_gen(categories,val_lambda):
+    history = {}
+    quantity_by_category = {}
+    mini = val_lambda - 2.5
+    for cat in categories:
+        quantity_by_category[cat.name] = np.random.randint(mini, np.random.randint(mini+5,15), HISTORY_LENGTH)
+        history[cat.name] = [np.random.choice(cat.product_list) for i in range(HISTORY_LENGTH)]
+    return [quantity_by_category,history]
+        
+
 class Profile:
     def __init__(self, sensibility):
         assert len(sensibility)==4
@@ -161,10 +171,11 @@ class Agent:
                 self.inertie[product_category.name] = [0, 0]
                 self.track_bought_to_plot[product_category.name] = np.zeros(env.HP["NB_TICKS"], dtype=object)
             else:
-                self.quantity_by_category[product_category.name] = history[0]
-                self.history[product_category.name] = history[1]
+                self.quantity_by_category = history[0]
+                self.history = history[1]
                 self.needs[product_category.name] = np.mean(self.quantity_by_category[product_category.name])
                 self.inertie[product_category.name] = [0, 0]
+                self.track_bought_to_plot[product_category.name] = np.zeros(env.HP["NB_TICKS"], dtype=object)
             self.history_price_quality[product_category.name] = []
             tmp_p = 0
             tmp_q = 0
@@ -750,4 +761,6 @@ class Product:
     
     def get_name(self):
         return self.name
+    
+
     
