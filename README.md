@@ -6,11 +6,13 @@ This repository contain a simulator of price dynamics and is made to contain too
 
 ### Quick start
 	
-	from src.model import *
-	import matplotlib.pyplot as plt
-	cat_0 = ProductsCategorie("catégorie 0",[Product("Produit_A", 10, 0.5, 1), Product("Produit_B", 12, 0.7, 1)])
-	env = Environment([cat_0],300,10)
-	env.initialise()
-	env.run()
-	results = env.get_favorites()
-	plt.plot(results)
+```
+from src.model import *
+import matplotlib.pyplot as plt
+cat_0 = ProductsCategorie("catégorie 0",[Product("Produit_A", 10, 0.5, 1), Product("Produit_B", 12, 0.7, 1)])
+env = Environment([cat_0],300,10)
+env.initialise()
+env.run()
+results = env.get_favorites()
+plt.plot(results)
+```
