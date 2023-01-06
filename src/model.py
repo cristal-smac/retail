@@ -203,7 +203,12 @@ class Agent:
         return self.sensibility
     
     def get_history(self):
-        return (self.history,self.quantity_by_category)
+        res = {}
+        for i in self.history.keys():
+            res [i] = []
+            for j in range(len(self.history[i])):
+                res [i] += [(self.history[i][j],self.quantity_by_category[i][j])]
+        return res
     
     def go_store(self):
         """
@@ -677,6 +682,12 @@ class Product:
         self.product_ad = 0 # Between 0 and 1, 1 everybody is touched by the ad, 0 nobody. 0.5 mean 50%
         self.nb_bought = 0
         self.special_promo_product = None 
+    
+    def __str__(self):
+        return self.name
+    
+    def __repr__(self):
+        return self.name
 
     def simple_promotion(self, percentage):
         """

@@ -2,6 +2,12 @@
 
 This repository contain a simulator of price dynamics and is made to contain tools related to simulation in marketing dynamics and simulation using ABM and individual centered approach.
 
+Team : CRISTAL Lab, SMAC team, Lille University
+
+Company : fifty-five
+
+Contact : jarod.vanderlynden@fifty-five.com, philippe.mathieu at univ-lille.fr, romain at fifty-five.com
+
 ## Price dynamics, simulate discounts in a store
 
 ### Quick start
