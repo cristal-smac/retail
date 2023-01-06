@@ -6,7 +6,7 @@ This repository contain a simulator of price dynamics and is made to contain too
 
 ### Quick start
 	
-```
+```python
 from src.model import *
 import matplotlib.pyplot as plt
 cat_0 = ProductsCategorie("catégorie 0",[Product("Produit_A", 10, 0.5, 1), Product("Produit_B", 12, 0.7, 1)])
