@@ -23,15 +23,15 @@ def prospect(x):
     else:
         return (np.exp(x)-1)
 
-def sat(x,space):
-    c = C
-    y = math.log(c-1)
-    if x >=space:
-        return  c / (1+math.exp(-((x-space)/SAT_ALPHA)+y))
-    elif x >= -space:
-        return 1
-    else:
-        return  c / (1+math.exp(-((x+space)/SAT_ALPHA)+y))
+# def sat(x,space):
+#     c = C
+#     y = math.log(c-1)
+#     if x >=space:
+#         return  c / (1+math.exp(-((x-space)/SAT_ALPHA)+y))
+#     elif x >= -space:
+#         return 1
+#     else:
+#         return  c / (1+math.exp(-((x+space)/SAT_ALPHA)+y))
     
 def reject_outliers(data, m = 300):
     d = np.abs(data - np.median(data))
@@ -195,7 +195,7 @@ class Agent:
 #             tmp_q = tmp_q / HISTORY_LENGTH
 #             self.ref[product_category.name] = Product("ref",tmp_p,tmp_q,1)
     
-    def get_product_inertia(self,product_category):
+    def __get_product_inertia(self,product_category):
         dict_product_freq = self.compute_freq_products(product_category)
         return max(dict_product_freq)
     
@@ -242,13 +242,13 @@ class Agent:
                 for product in product_categorie.product_list:
                     # If the product is in state  a 3 buy 1 free for example.
                     if product.special_promo_product is not None:
-                        utility, quantity = self.compute_utility(product.special_promo_product, product_categorie, dict_product_freq)
+                        utility, quantity = self.__compute_utility(product.special_promo_product, product_categorie, dict_product_freq)
                         # We add the base product with the promoted product for the compute of the number of this kind of product bought 
                         # If product.one_pack_quantity (ex: un paquet de pates de 800g) < quantity (je veux acheter 1kg)
                         if product.special_promo_product.one_pack_quantity < quantity:
                             possible_buy.append([(product.special_promo_product, product), quantity, utility])
                     # We compute the utility of the product 
-                    utility, quantity = self.compute_utility(product,
+                    utility, quantity = self.__compute_utility(product,
                                                              product_categorie,
                                                              dict_product_freq)
                     if product.one_pack_quantity <= quantity:
@@ -287,7 +287,7 @@ class Agent:
                             print("Pas de temps num : ",self.env.tick," Agent : ",self.name," Besoin", self.needs[product_categorie.name]," Achat : Rien", "Quantité : 0")
                 return 0
 
-    def compute_quantity(self, product_category):
+    def __compute_quantity(self, product_category):
         moy = self.needs[product_category.name]
         data = self.quantity_by_category[product_category.name][-4:]
         quantity = max(0, moy+(np.sum(-data+moy)))
@@ -322,7 +322,7 @@ class Agent:
         y = math.log(c-1)
         return c / (1 + math.exp(-x/self.env.HP["SAT_ALPHA"]+y))
 
-    def compute_utility(self, product, product_categorie,
+    def __compute_utility(self, product, product_categorie,
                         dict_product_freq, seconde_product=None):
         """
         For this agent, this function computes his opinion of the product in parameters.
@@ -360,7 +360,7 @@ class Agent:
             threshold = 0
         U = threshold
             
-        quantity = self.compute_quantity(product_categorie) 
+        quantity = self.__compute_quantity(product_categorie) 
         if quantity < 0:
             quantity = 0
         quantity = np.random.normal(quantity * (self.sat(U,20)),quantity/4)
@@ -369,7 +369,7 @@ class Agent:
         threshold=float(threshold)
         return threshold, quantity
         
-    def compute_utility_ref(self,product,dict_product_freq):
+    def ____compute_utility_ref(self,product,dict_product_freq):
         ref = product
         U = ((self.sensibility["quality"] * (self.env.HP["QUALITY"]* (self.env.HP["PHI"]* max(0,product.quality - ref.quality)+ (max(0,ref.quality-product.quality))) ))+
             (self.sensibility["price"] * (self.env.HP["PRICE"]* (self.env.HP["PHI"] *max(0,(product.promotion_price) - (ref.promotion_price))+ max(0,(ref.promotion_price) - (product.promotion_price))))) )#+
@@ -415,8 +415,10 @@ class Agent:
         if self.env.trace:
             print("Pas de temps num : ",self.env.tick," Agent : ",self.name," Besoin", self.needs[product_categorie.name]," Achat : ", product.name, "Quantité : ",nb_pack_buy)
         return 0
+            
     
-class Environment:
+    
+class SMA:
     """
     This class needs products_categories class filled with products at the creation to work properly.
     creation: Environement([product_categorie1,product categorie2,...])
@@ -552,7 +554,7 @@ class Environment:
             self.most_buy[category][p.name] += [res[p.name]]
         return 0
 
-    def changing_attractivity(self):
+    def __changing_attractivity(self):
         """
         At each time step the attractivity of the supermarket/store change, if there is promotions,
         it raise, if there is no promtion it goes down. 
@@ -565,7 +567,7 @@ class Environment:
         """
         for agent in self.agents:
             agent.go_store()
-        self.changing_attractivity()
+        self.__changing_attractivity()
 
     def get_history_CA(self):
         res = np.zeros(52)
@@ -615,6 +617,9 @@ class Environment:
                 #plt.plot(environement.most_buy[cat][product_name])
                 res[product_name] = self.most_buy[cat][product_name]
         return res
+    
+    def get_turnover(self):
+        return self.revenues
     
 class ProductsCategorie:
     """
