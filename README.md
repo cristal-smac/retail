@@ -22,3 +22,9 @@ env.run()
 results = env.get_favorites()
 plt.plot(results)
 ```
+
+### Jupyter Notebook
+
+Une feuille Jupyter est mise en place pour détailler l'ensemble des opérations possibles avec ce modèle et quelques exemples de résultats obtenus.
+Pour pouvez lancer cette feuille idrectement à partir du lien suivant :
+[![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/cristal-smac/retail.git/master?filepath=Exemple.ipynb)
