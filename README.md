@@ -6,7 +6,7 @@ Team : CRISTAL Lab, SMAC team, Lille University
 
 Company : fifty-five
 
-Contact : jarod.vanderlynden@fifty-five.com, philippe.mathieu at univ-lille.fr, romain at fifty-five.com
+Contact : jarod.vanderlynden@fifty-five.com, philippe.mathieu@univ-lille.fr, romain@fifty-five.com
 
 ## Price dynamics, simulate discounts in a store
 
