@@ -16,9 +16,9 @@ Contact : jarod.vanderlynden@fifty-five.com, philippe.mathieu@univ-lille.fr, rom
 from src.model import *
 import matplotlib.pyplot as plt
 cat_0 = ProductsCategorie("catégorie 0",[Product("Produit_A", 10, 0.5, 1), Product("Produit_B", 12, 0.7, 1)])
-env = Environment([cat_0],300,10)
-env.initialise()
-env.run()
+sma = SMA([cat_0],300,10)
+sma.initialise()
+sma.run()
 results = env.get_favorites()
 plt.plot(results)
 ```
