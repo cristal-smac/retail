@@ -44,21 +44,21 @@ def reject_outliers(data, m = 300):
 
 
 def generate_price_sensibility():
-    return {"inertie":np.random.uniform(1,2,1),"price":np.random.uniform(20,21,1),
+    return {"inertie":np.random.uniform(1,2,1),"price":np.random.uniform(10,21,1),
             "quality":np.random.uniform(1,2,1),"promophile":np.random.uniform(1,2,1)}
             #,"jackpot":np.random.uniform(1,2,1),"advertising":np.random.uniform(1,2,1),"last_price":np.random.uniform(1,2,1)}
 
 def generate_quality_sensibility():
     return {"inertie":np.random.uniform(1,2,1),"price":np.random.uniform(1,2,1),
-            "quality":np.random.uniform(20,21,1),"promophile":np.random.uniform(1,2,1)}
+            "quality":np.random.uniform(10,21,1),"promophile":np.random.uniform(1,2,1)}
             #,"jackpot":np.random.uniform(1,2,1),"advertising":np.random.uniform(1,2,1),"last_price":np.random.uniform(1,2,1)}
 
 def generate_promophile_sensibility():
     return {"inertie":np.random.uniform(1,2,1),"price":np.random.uniform(1,2,1),
-            "quality":np.random.uniform(1,2,1),"promophile":np.random.uniform(20,21,1)}
+            "quality":np.random.uniform(1,2,1),"promophile":np.random.uniform(10,21,1)}
             #,"jackpot":np.random.uniform(1,2,1),"advertising":np.random.uniform(1,2,1),"last_price":np.random.uniform(1,2,1)}
 def generate_inertie_sensibility():
-    return {"inertie":np.random.uniform(20,21,1),"price":np.random.uniform(1,2,1),
+    return {"inertie":np.random.uniform(10,21,1),"price":np.random.uniform(1,2,1),
             "quality":np.random.uniform(1,2,1),"promophile":np.random.uniform(1,2,1)}
             #,"jackpot":np.random.uniform(1,2,1),"advertising":np.random.uniform(1,2,1),"last_price":np.random.uniform(1,2,1)}
 
@@ -101,25 +101,25 @@ def generate_price_war_categorie(name):
     packs = [pack("A", 10, 0.5, 1), pack("B", 12, 0.7, 1)]
     return packsCategorie(name, packs)
 
-def History_gen(categories,val_lambda):
+def History_gen(categories,val_lambda,hist_l):
     history = {}
     quantity_by_category = {}
     mini = val_lambda - 2.5
     for cat in categories:
-        quantity_by_category[cat.name] = np.random.randint(mini, np.random.randint(mini+5,15), HISTORY_LENGTH)
-        history[cat.name] = [np.random.choice(cat.pack_list) for i in range(HISTORY_LENGTH)]
+        quantity_by_category[cat.name] = np.random.randint(mini, np.random.randint(mini+5,15), hist_l)
+        history[cat.name] = [np.random.choice(cat.pack_list) for i in range(hist_l)]
     return [quantity_by_category,history]
         
 
-class Profile:
+class Profil:
     def __init__(self, sensibility):
-        assert len(sensibility)==4
-        sum_s = sum(sensibility)
-        self.price = sensibility[0]/sum_s
-        self.quality = sensibility[1]/sum_s
-        self.inertia = sensibility[2]/sum_s
-        self.promo = sensibility[3]/sum_s
-    def get_profile(self):
+        assert len(sensibility.keys())==4
+        sum_s = sum(sensibility.values())
+        self.price = sensibility["price"]/sum_s
+        self.quality = sensibility["quality"]/sum_s
+        self.inertia = sensibility["inertia"]/sum_s
+        self.promo = sensibility["promophile"]/sum_s
+    def get_profil(self):
         return {"inertie":self.inertia,"price":self.price,
             "quality":self.quality,"promophile":self.promo}
 
@@ -132,7 +132,7 @@ class Agent:
     pack which fit the most. Agents are initialized automaticaly throught the environement class. 
     """
     
-    def __init__(self, name, env, history=None,profile=None):
+    def __init__(self, name, env, history=None,profil=None):
         """
         """
         self.name = name
@@ -140,11 +140,11 @@ class Agent:
         self.jackpot = 0
         self.needs = {}
         self.type = np.random.choice([0, 1, 2, 3, 4])
-        if profile == None:
+        if profil == None:
             self.sensibility = [generate_price_sensibility(),generate_quality_sensibility(),
                                 generate_promophile_sensibility(),generate_inertie_sensibility(),generate_random_sensibility()][self.type]
         else:
-            self.sensibility = profile
+            self.sensibility = profil.get_profil()
 #         self.sensibility = generate_price_sensibility()
         sum_norm = sum(self.sensibility.values())
         for sensi in self.sensibility.keys():
@@ -164,13 +164,14 @@ class Agent:
             if history is None:
                 base_need = np.random.randint(1,10)
                 mini = np.random.randint(0,5)
-                self.quantity_by_category[pack_category.name] = np.random.randint(mini, np.random.randint(mini+5,15), HISTORY_LENGTH) #List of lasts quantity bought
+                self.quantity_by_category[pack_category.name] = np.random.randint(mini, np.random.randint(mini+5,15), env.HP["HIST_L"]) #List of lasts quantity bought
                 # self.max_quantity_by_category[pack_category.name] = np.mean(self.quantity_by_category[pack_category.name]) * MAX_QUANTITY
-                self.history[pack_category.name] = [np.random.choice(pack_category.pack_list) for i in range(HISTORY_LENGTH)] #Liste et quantitée glissante. 
+                self.history[pack_category.name] = [np.random.choice(pack_category.pack_list) for i in range(env.HP["HIST_L"])] #Liste et quantitée glissante. 
                 self.needs[pack_category.name] = np.mean(reject_outliers(self.quantity_by_category[pack_category.name]))
                 self.inertie[pack_category.name] = [0, 0]
                 self.track_bought_to_plot[pack_category.name] = np.zeros(env.HP["NB_TICKS"], dtype=object)
             else:
+                assert(len(history[1][pack_category.name])==(env.HP["HIST_L"]))#f"Variable History length is : {len(history[1]} and the history length of ABM need is {env.HP["HIST_L"]}"
                 self.quantity_by_category = history[0]
                 self.history = history[1]
                 self.needs[pack_category.name] = np.mean(self.quantity_by_category[pack_category.name])
@@ -183,8 +184,8 @@ class Agent:
                 self.history_price_quality[pack_category.name] += [(tmp.promotion_price,tmp.quality)]
                 tmp_p += tmp.promotion_price
                 tmp_q += tmp.quality
-            tmp_p = tmp_p / HISTORY_LENGTH
-            tmp_q = tmp_q / HISTORY_LENGTH
+            tmp_p = tmp_p / env.HP["HIST_L"]
+            tmp_q = tmp_q / env.HP["HIST_L"]
             self.ref[pack_category.name] = Pack("ref",tmp_p,tmp_q,1)
 #             tmp_p = 0
 #             tmp_q = 0
@@ -198,6 +199,9 @@ class Agent:
     def __get_pack_inertia(self,pack_category):
         dict_pack_freq = self.compute_freq_packs(pack_category)
         return max(dict_pack_freq)
+    
+    def get_profil(self):
+        return self.sensibility
     
     def get_sensibility(self):
         return self.sensibility
@@ -401,8 +405,8 @@ class Agent:
         if np.random.random() < (quantity/pack.one_pack_quantity - nb_pack_buy):
             nb_pack_buy += 1
         self.history_price_quality[pack_categorie.name] = self.history_price_quality[pack_categorie.name] [1:] + [(pack.promotion_price,pack.quality)]
-        tmp_p = sum(i for i, j in self.history_price_quality[pack_categorie.name]) / HISTORY_LENGTH
-        tmp_q = sum(j for i, j in self.history_price_quality[pack_categorie.name]) / HISTORY_LENGTH
+        tmp_p = sum(i for i, j in self.history_price_quality[pack_categorie.name]) / self.env.HP["HIST_L"]
+        tmp_q = sum(j for i, j in self.history_price_quality[pack_categorie.name]) / self.env.HP["HIST_L"]
         self.ref[pack_categorie.name] = Pack("ref",tmp_p,tmp_q,1)
         self.quantity_by_category[pack_categorie.name]=np.append(self.quantity_by_category[pack_categorie.name][1:],[nb_pack_buy * pack.one_pack_quantity])
         self.needs[pack_categorie.name] = np.mean(reject_outliers(self.quantity_by_category[pack_categorie.name]))
@@ -429,7 +433,7 @@ class SMA:
 
     """
 
-    def __init__(self, packs_categories, NB_AGENTS=50, NB_TICKS=52, agent_data=None):
+    def __init__(self, packs_categories, NB_AGENTS, NB_TICKS, h_length=50, agent_data=None):
         """
         Initialize the environement of the simulation.
         Categories of packs and packs whithin thoses categories are the environement and we create our agents.
@@ -440,6 +444,7 @@ class SMA:
         self.HP = {}
         self.HP["NB_AGENTS"] = NB_AGENTS
         self.HP["NB_TICKS"] = NB_TICKS
+        self.HP["HIST_L"] = h_length
         self.agents = []
         self.most_buy= {}
         self.packs_categories = packs_categories
