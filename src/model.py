@@ -72,7 +72,7 @@ def create_random_packs_categorie(name):
     packs = []
     for i in range(6):
         packs.append(pack((name + str(i)), base_price + np.random.randint(-base_price/2,base_price/2),np.random.random(), np.random.randint(1,10)))
-    return packsCategorie(name, packs)
+    return Category(name, packs)
 
 
 def generate_pack_categorie(name):
@@ -82,9 +82,9 @@ def generate_pack_categorie(name):
         price = base_price + np.random.normal(0,(base_price/4))
         quality = np.random.normal((price/100),0.1)
         for i in range(3): 
-            packs.append(pack((name + str(i+(j*3))), price, np.absolute(quality), 2 * (i+1)))
+            packs.append(Pack((name + str(i+(j*3))), price, np.absolute(quality), 2 * (i+1)))
             price = price * 0.9
-    return packsCategorie(name, packs)
+    return Category(name, packs)
 
 def generate_pack_categorie_two(name):
     base_price = np.random.randint(10, 100)
@@ -94,12 +94,12 @@ def generate_pack_categorie_two(name):
         quality = np.random.normal((price/100),0.1)
         packs.append(pack((name + str(i)), price, np.absolute(quality), 2 * (i+1)))
         # price = price * 0.9
-    return packsCategorie(name, packs, np.random.random())
+    return Category(name, packs, np.random.random())
 
 def generate_price_war_categorie(name):
     base_price = 10
     packs = [pack("A", 10, 0.5, 1), pack("B", 12, 0.7, 1)]
-    return packsCategorie(name, packs)
+    return Category(name, packs)
 
 def History_gen(categories,val_lambda,hist_l):
     history = {}
@@ -132,13 +132,14 @@ class Agent:
     pack which fit the most. Agents are initialized automaticaly throught the environement class. 
     """
     
-    def __init__(self, name, env, history=None,profil=None):
+    def __init__(self, name, env, l_history = 50, history=None,profil=None):
         """
         """
         self.name = name
         # We assume that all agents have a fidelity card for now.
         self.jackpot = 0
         self.needs = {}
+        self.h_length = l_history
         self.type = np.random.choice([0, 1, 2, 3, 4])
         if profil == None:
             self.sensibility = [generate_price_sensibility(),generate_quality_sensibility(),
@@ -164,14 +165,14 @@ class Agent:
             if history is None:
                 base_need = np.random.randint(1,10)
                 mini = np.random.randint(0,5)
-                self.quantity_by_category[pack_category.name] = np.random.randint(mini, np.random.randint(mini+5,15), env.HP["HIST_L"]) #List of lasts quantity bought
+                self.quantity_by_category[pack_category.name] = np.random.randint(mini, np.random.randint(mini+5,15), self.h_length) #List of lasts quantity bought
                 # self.max_quantity_by_category[pack_category.name] = np.mean(self.quantity_by_category[pack_category.name]) * MAX_QUANTITY
-                self.history[pack_category.name] = [np.random.choice(pack_category.pack_list) for i in range(env.HP["HIST_L"])] #Liste et quantitée glissante. 
+                self.history[pack_category.name] = [np.random.choice(pack_category.pack_list) for i in range(self.h_length)] #Liste et quantitée glissante. 
                 self.needs[pack_category.name] = np.mean(reject_outliers(self.quantity_by_category[pack_category.name]))
                 self.inertie[pack_category.name] = [0, 0]
                 self.track_bought_to_plot[pack_category.name] = np.zeros(env.HP["NB_TICKS"], dtype=object)
             else:
-                assert(len(history[1][pack_category.name])==(env.HP["HIST_L"]))#f"Variable History length is : {len(history[1]} and the history length of ABM need is {env.HP["HIST_L"]}"
+                assert(len(history[1][pack_category.name])==(self.h_length))#f"Variable History length is : {len(history[1]} and the history length of ABM need is {env.HP["HIST_L"]}"
                 self.quantity_by_category = history[0]
                 self.history = history[1]
                 self.needs[pack_category.name] = np.mean(self.quantity_by_category[pack_category.name])
@@ -184,8 +185,8 @@ class Agent:
                 self.history_price_quality[pack_category.name] += [(tmp.promotion_price,tmp.quality)]
                 tmp_p += tmp.promotion_price
                 tmp_q += tmp.quality
-            tmp_p = tmp_p / env.HP["HIST_L"]
-            tmp_q = tmp_q / env.HP["HIST_L"]
+            tmp_p = tmp_p / self.h_length
+            tmp_q = tmp_q / self.h_length
             self.ref[pack_category.name] = Pack("ref",tmp_p,tmp_q,1)
 #             tmp_p = 0
 #             tmp_q = 0
@@ -241,7 +242,6 @@ class Agent:
                 self.env.non_buyers[self.env.tick] += 1
                 if self.env.trace:
                     print("Pas de temps num : ",self.env.tick," Agent : ",self.name," Besoin", self.needs[pack_categorie.name]," Achat : Rien", "Quantité : 0")
-                return 0
             else: 
                 for pack in pack_categorie.pack_list:
                     # If the pack is in state  a 3 buy 1 free for example.
@@ -289,7 +289,6 @@ class Agent:
                         self.env.non_buyers[self.env.tick] += 1
                         if self.env.trace:
                             print("Pas de temps num : ",self.env.tick," Agent : ",self.name," Besoin", self.needs[pack_categorie.name]," Achat : Rien", "Quantité : 0")
-                return 0
 
     def __compute_quantity(self, pack_category):
         moy = self.needs[pack_category.name]
@@ -405,8 +404,8 @@ class Agent:
         if np.random.random() < (quantity/pack.one_pack_quantity - nb_pack_buy):
             nb_pack_buy += 1
         self.history_price_quality[pack_categorie.name] = self.history_price_quality[pack_categorie.name] [1:] + [(pack.promotion_price,pack.quality)]
-        tmp_p = sum(i for i, j in self.history_price_quality[pack_categorie.name]) / self.env.HP["HIST_L"]
-        tmp_q = sum(j for i, j in self.history_price_quality[pack_categorie.name]) / self.env.HP["HIST_L"]
+        tmp_p = sum(i for i, j in self.history_price_quality[pack_categorie.name]) / self.h_length
+        tmp_q = sum(j for i, j in self.history_price_quality[pack_categorie.name]) / self.h_length
         self.ref[pack_categorie.name] = Pack("ref",tmp_p,tmp_q,1)
         self.quantity_by_category[pack_categorie.name]=np.append(self.quantity_by_category[pack_categorie.name][1:],[nb_pack_buy * pack.one_pack_quantity])
         self.needs[pack_categorie.name] = np.mean(reject_outliers(self.quantity_by_category[pack_categorie.name]))
@@ -468,9 +467,16 @@ class SMA:
     def add_agent(self,agents_to_add):
         for agent in agents_to_add:
             self.agents.append(agent)
+            
+    def get_packs(self):
+        res = []
+        for i in self.packs_categories:
+            res += i.pack_list
+        return res
 
     def initialise(self, price=0.5, quality=100, promophile=5, sat_alpha=100, phi=0.3, c = 2, inertia = 2):
         self.tick = 0
+        self.promo = [0] * self.HP["NB_TICKS"]
         self.most_buy= {}
         for category in self.packs_categories:
             self.most_buy[category] = {}
@@ -533,13 +539,23 @@ class SMA:
             if tmp_reduce != 0:
                 self.packs_categories[tmp_reduce[1]].pack_list[tmp_reduce[2]].reduce_price(tmp_reduce[0])
     
-    def make_promo(self,promo_type):
-        if promo_type[0] == 0:
-            self.promo[promo_type[2][0]] = (0,promo_type[3],promo_type[4],promo_type[1])
-            self.promo[promo_type[2][1]] = (0,promo_type[3],promo_type[4],0)
+    def make_promo(self,p_type,quantity,ticks,category,pack):
+        index = None
+        for i in range(len(self.packs_categories)):
+            if self.packs_categories[i].name == category:
+                index = i
+        assert index != None
+        pack_index = None
+        for i in range(len(self.packs_categories[index].pack_list)):
+            if self.packs_categories[index].pack_list[i].name == pack:
+                pack_index = i
+        assert pack_index != None
+        if p_type == 0:           
+            self.promo[ticks[0]] = (0,index,pack_index,quantity)
+            self.promo[ticks[1]] = (0,index,pack_index,0)
         else:
-            self.promo[promo_type[2][0]] = (1,promo_type[3],promo_type[4],promo_type[1])
-            self.promo[promo_type[2][0]] = (1,promo_type[3],promo_type[4],0)
+            self.promo[promo_type[2][0]] = (1,index,pack_index,quantity)
+            self.promo[promo_type[2][0]] = (1,index,pack_index,0)
             
     def reduce_price(self,percent, tick, cat ,prod):
         self.reduce[tick] = (percent,cat,prod)
@@ -601,12 +617,20 @@ class SMA:
         plt.show()
         return 0
     
-    def show_sales(self):
-        categorie = self.packs_categories[0]
-        for pack in categorie.pack_list:
-            plt.plot(self.cumulative_nb_bought_per_pack[pack.name])
-        plt.show()
+    def show_sales_packs(self):
+        for categorie in self.packs_categories:
+            for pack in categorie.pack_list:
+                plt.plot(self.cumulative_nb_bought_per_pack[pack.name])
+            plt.legend([pack.name for pack in categorie.pack_list])
+            plt.show()
         return 0
+    
+#     def show_sales(self):
+#         categorie = self.packs_categories[0]
+#         for pack in categorie.pack_list:
+#             plt.plot(self.cumulative_nb_bought_per_pack[pack.name])
+#         plt.show()
+#         return 0
     
     def get_sales(self):
         categorie = self.packs_categories[0]
