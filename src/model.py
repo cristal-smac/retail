@@ -101,13 +101,15 @@ def generate_price_war_categorie(name):
     packs = [pack("A", 10, 0.5, 1), pack("B", 12, 0.7, 1)]
     return Category(name, packs)
 
-def History_gen(categories,val_lambda,hist_l):
+def genHistory(categories,val_lambda,hist_l):
     history = {}
     quantity_by_category = {}
-    mini = val_lambda - 2.5
+    cpt=0
     for cat in categories:
+        mini = val_lambda[cpt] - 2.5
         quantity_by_category[cat.name] = np.random.randint(mini, np.random.randint(mini+5,15), hist_l)
         history[cat.name] = [np.random.choice(cat.pack_list) for i in range(hist_l)]
+        cpt+=1
     return [quantity_by_category,history]
         
 
@@ -119,7 +121,8 @@ class Profil:
         self.quality = sensibility["quality"]/sum_s
         self.inertia = sensibility["inertia"]/sum_s
         self.promo = sensibility["promophile"]/sum_s
-    def get_profil(self):
+        
+    def getProfil(self):
         return {"inertie":self.inertia,"price":self.price,
             "quality":self.quality,"promophile":self.promo}
 
@@ -132,20 +135,20 @@ class Agent:
     pack which fit the most. Agents are initialized automaticaly throught the environement class. 
     """
     
-    def __init__(self, name, env, l_history = 50, history=None,profil=None):
+    def __init__(self, name, env, hLength = 50, history=None,profil=None):
         """
         """
         self.name = name
         # We assume that all agents have a fidelity card for now.
         self.jackpot = 0
         self.needs = {}
-        self.h_length = l_history
+        self.h_length = hLength
         self.type = np.random.choice([0, 1, 2, 3, 4])
         if profil == None:
             self.sensibility = [generate_price_sensibility(),generate_quality_sensibility(),
                                 generate_promophile_sensibility(),generate_inertie_sensibility(),generate_random_sensibility()][self.type]
         else:
-            self.sensibility = profil.get_profil()
+            self.sensibility = profil.getProfil()
 #         self.sensibility = generate_price_sensibility()
         sum_norm = sum(self.sensibility.values())
         for sensi in self.sensibility.keys():
@@ -201,13 +204,13 @@ class Agent:
         dict_pack_freq = self.compute_freq_packs(pack_category)
         return max(dict_pack_freq)
     
-    def get_profil(self):
+    def getProfil(self):
         return self.sensibility
     
     def get_sensibility(self):
         return self.sensibility
     
-    def get_history(self):
+    def getHistory(self):
         res = {}
         for i in self.history.keys():
             res [i] = []
@@ -414,7 +417,7 @@ class Agent:
         pack.nb_bought += (nb_pack_buy *pack.one_pack_quantity) #1
         self.env.one_tick_revenues += nb_pack_buy * pack.pack_price
         self.env.one_tick_sells_quantity += nb_pack_buy * pack.one_pack_quantity
-        self.track_bought_to_plot[pack_categorie.name][self.env.tick] = pack
+        self.track_bought_to_plot[pack_categorie.name][self.env.tick] = (pack,nb_pack_buy *pack.one_pack_quantity)
         if self.env.trace:
             print("Pas de temps num : ",self.env.tick," Agent : ",self.name," Besoin", self.needs[pack_categorie.name]," Achat : ", pack.name, "Quantité : ",nb_pack_buy)
         return 0
@@ -467,7 +470,7 @@ class SMA:
                 self.agents.append(Agent("agent " + str(len(self.agents)),self))
             else:
                 self.agents.append(Agent("agent " + str(len(self.agents)),self, agent_data[i]))
-    def add_agent(self,agents_to_add):
+    def addAgent(self,agents_to_add):
         for agent in agents_to_add:
             self.agents.append(agent)
             
@@ -532,7 +535,7 @@ class SMA:
             tmp_promo = self.promo[i]
             if tmp_promo != 0:
                 if tmp_promo[0] == 0:
-                    self.packs_categories[tmp_promo[1]].pack_list[tmp_promo[2]].simple_promotion(tmp_promo[3])
+                    self.packs_categories[tmp_promo[1]].pack_list[tmp_promo[2]].simplePromotion(tmp_promo[3])
                 else:
                     if tmp_promo[3] == 0:
                         self.packs_categories[tmp_promo[1]].pack_list[tmp_promo[2]].unmake_pack_promotion()
@@ -603,14 +606,14 @@ class SMA:
               self.mean_needs[cat.name] += [one_tick_mean]
         self.__changing_attractivity()
 
-    def get_history_CA(self):
+    def getHistory_CA(self):
         res = np.zeros(52)
         for nb_agent in range(self.HP["NB_AGENTS"]):
             for cpt in range(len(self.agents[nb_agent].history["bananes"])):
                 res[cpt] += self.agents[nb_agent].quantity_by_category["bananes"][cpt] * self.agents[nb_agent].history["bananes"][cpt].price
         return res
 
-    def get_history_nb_buy(self):
+    def getHistory_nb_buy(self):
         res = np.zeros(52)
         for cat in self.packs_categories:
             for nb_agent in range(self.HP["NB_AGENTS"]):
@@ -630,7 +633,7 @@ class SMA:
         plt.show()
         return 0
     
-    def show_sales_packs(self):
+    def showPacksSales(self):
         for categorie in self.packs_categories:
             for pack in categorie.pack_list:
                 plt.plot(self.cumulative_nb_bought_per_pack[pack.name])
@@ -645,14 +648,14 @@ class SMA:
 #         plt.show()
 #         return 0
     
-    def get_sales(self):
+    def getSales(self):
         categorie = self.packs_categories[0]
         res = []
         for pack in categorie.pack_list:
             res += [self.cumulative_nb_bought_per_pack[pack.name]]
         return np.array(res).T
     
-    def get_favorites(self):
+    def getFavorites(self):
         res = {}
         for cat in self.most_buy.keys():
             for pack_name in self.most_buy[cat].keys():
@@ -660,8 +663,46 @@ class SMA:
                 res[pack_name] = self.most_buy[cat][pack_name]
         return res
     
-    def get_turnover(self):
+    def getTurnover(self):
         return self.revenues
+    
+    def showProfileSales(self):
+        # Création d'une map avec comme clé Produit et Profil et comme valeur les achats des profils sur ce produit.
+        res = {}
+        for cat in self.packs_categories:
+            for pack in cat.pack_list:
+                res[pack.name] = {}
+                for profiles in range(5):
+                    res[pack.name][profiles] = [0]*self.HP["NB_TICKS"]
+        # Parcours des agents. Ajout de leurs ahcats dans la map selon leurs profils
+        for agent in self.agents:
+            for cat in self.packs_categories:
+                cpt=0
+                for p in agent.track_bought_to_plot[cat.name]:
+                    if p == 0:
+                        None
+                    else:
+                        res[p[0].name][agent.type][cpt] += 1 # p[1]
+                    cpt+=1
+        # Plot
+        fig, axs = plt.subplots(5, 1, sharex=True,figsize=(9,6))
+        legendProduct = []
+        prof = ["Prix","Qualité","Promophile","Inertiel","Equilibré"]
+        for profil in range(5):
+#             axs[profil].annotate(prof[profil])
+            axs[profil].text(.01, .99, prof[profil], ha='left', va='top', transform=axs[profil].transAxes)
+
+            if len(res.keys())>=3:
+                for k in list(res.keys())[:3]:
+                    legendProduct += [k]
+                    axs[profil].plot(res[k][profil])
+                    #axs[profil].axvspan(30, 34, alpha=0.2, color='blue')
+            else:
+                for k in list(res.keys()):
+                    legendProduct += [k]
+                    axs[profil].plot(res[k][profil])
+        axs[0].legend(legendProduct)
+        
     
 class Category:
     """
@@ -681,7 +722,7 @@ class Category:
 #             self.mean_price += (i.price/i.one_pack_quantity)
 #         self.mean_price = self.mean_price/len(pack_list)
 
-    def add_pack(self,one_pack):
+    def addPack(self,one_pack):
         """
         one_pack: type pack. A pack to add at this category of pack. 
         This just add a new pack into this category. TODO find a way to avoid multiple same pack.
@@ -689,12 +730,12 @@ class Category:
         self.pack_list.insert(0,one_pack)
         return 0
         
-    def get_packs(self):
+    def getPacks(self):
         return self.pack_list
     
-    def show_packs(self):
+    def showPacks(self):
         for pack in self.pack_list:
-            print("Nom : ",pack.get_name(), ", Prix total : ",pack.get_price_total())
+            print("Nom : ",pack.getName(), ", Prix total : ",pack.getTotalPrice())
         return 0
 
 
@@ -736,11 +777,11 @@ class Pack:
     def __repr__(self):
         return self.name
 
-    def simple_promotion(self, percentage):
+    def simplePromotion(self, percentage):
         """
         percentage : int, between 0 and 100
         Update the promotion price and the attribute is_promo to
-        correspond to a perentage% promotion. pack.simple_promotion(30)
+        correspond to a perentage% promotion. pack.simplePromotion(30)
         will make a 30% promotion on this pack.
         """
         self.promotion_price = self.price * (1 - (percentage/100))
@@ -756,7 +797,7 @@ class Pack:
         """
         percentage : int, between 0 and 100
         Update the promotion price and the attribute is_promo to
-        correspond to a perentage% promotion. pack.simple_promotion(30)
+        correspond to a perentage% promotion. pack.simplePromotion(30)
         will make a 30% promotion on this pack.
         """
         promo = self.price / self.promotion_price
@@ -771,7 +812,7 @@ class Pack:
         """
         percentage : int, between 0 and 100
         Update the promotion price and the attribute is_promo to
-        correspond to a perentage% promotion. pack.simple_promotion(30)
+        correspond to a perentage% promotion. pack.simplePromotion(30)
         will make a 30% promotion on this pack.
         """
         promo = self.price / self.promotion_price
@@ -811,13 +852,13 @@ class Pack:
         self.special_promo_pack = None
         self.is_promo = 0
         
-    def get_price_unit(self):
+    def getPriceUnit(self):
         return self.price
     
-    def get_price_total(self):
+    def getTotalPrice(self):
         return (self.price*self.one_pack_quantity)
     
-    def get_name(self):
+    def getName(self):
         return self.name
     
 
