@@ -545,7 +545,7 @@ class SMA:
             if tmp_reduce != 0:
                 self.packs_categories[tmp_reduce[1]].pack_list[tmp_reduce[2]].reduce_price(tmp_reduce[0])
     
-    def make_promo(self,p_type,quantity,ticks,category,pack):
+    def makePromo(self,p_type,quantity,ticks,category,pack):
         index = None
         for i in range(len(self.packs_categories)):
             if self.packs_categories[i].name == category:
@@ -588,8 +588,15 @@ class SMA:
         """
         self.attractivity += self.attractivity_change
     
-    def get_mean_needs(self):
+    def getMeanNeeds(self):
         return self.mean_needs
+    
+    def showMeanNeeds(self):
+        for i in self.packs_categories:
+            plt.plot(self.mean_needs[i.name])
+        plt.xlabel("Ticks")
+        plt.ylabel("Prix moyen des packs de référence")
+        plt.show()
     
     def run_once(self):
         """
