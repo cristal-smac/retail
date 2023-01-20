@@ -163,19 +163,18 @@ class Agent:
         self.quantity_by_category = {}
         self.max_quantity_by_category = {}
         self.track_bought_to_plot = {}
-        # Besoin à calibrer, il faut l'associer aux achats moyen précédents ou relié au profil.
+        # The needs of agents can be calibrated in future work
         for pack_category in self.env.packs_categories:
             if history is None:
                 base_need = np.random.randint(1,10)
                 mini = np.random.randint(0,5)
-                self.quantity_by_category[pack_category.name] = np.random.randint(mini, np.random.randint(mini+5,15), self.h_length) #List of lasts quantity bought
-                # self.max_quantity_by_category[pack_category.name] = np.mean(self.quantity_by_category[pack_category.name]) * MAX_QUANTITY
-                self.history[pack_category.name] = [np.random.choice(pack_category.pack_list) for i in range(self.h_length)] #Liste et quantitée glissante. 
+                self.quantity_by_category[pack_category.name] = np.random.randint(mini, np.random.randint(mini+5,15), self.h_length) #List of lasts quantity bought.
+                self.history[pack_category.name] = [np.random.choice(pack_category.pack_list) for i in range(self.h_length)] #List of last quantity. 
                 self.needs[pack_category.name] = np.mean(reject_outliers(self.quantity_by_category[pack_category.name]))
                 self.inertie[pack_category.name] = [0, 0]
                 self.track_bought_to_plot[pack_category.name] = np.zeros(env.HP["NB_TICKS"], dtype=object)
             else:
-                assert(len(history[1][pack_category.name])==(self.h_length))#f"Variable History length is : {len(history[1]} and the history length of ABM need is {env.HP["HIST_L"]}"
+                assert(len(history[1][pack_category.name])==(self.h_length))
                 self.quantity_by_category = history[0]
                 self.history = history[1]
                 self.needs[pack_category.name] = np.mean(self.quantity_by_category[pack_category.name])
@@ -191,14 +190,7 @@ class Agent:
             tmp_p = tmp_p / self.h_length
             tmp_q = tmp_q / self.h_length
             self.ref[pack_category.name] = Pack("ref",tmp_p,tmp_q,1)
-#             tmp_p = 0
-#             tmp_q = 0
-#             for pack in self.history_price_quality[pack_category.name]:
-#                 tmp_p += pack.price 
-#                 tmp_q += pack.quality
-#             tmp_p = tmp_p / HISTORY_LENGTH
-#             tmp_q = tmp_q / HISTORY_LENGTH
-#             self.ref[pack_category.name] = pack("ref",tmp_p,tmp_q,1)
+
     
     def __get_pack_inertia(self,pack_category):
         dict_pack_freq = self.compute_freq_packs(pack_category)
@@ -238,28 +230,27 @@ class Agent:
             assert(p<=1 and p>=0), f"Variable p is : {p} and variable need is {self.needs}"
             # The agent is not interested in the category. 
             if np.random.random()>p:
-                self.history[pack_categorie.name] = np.append(self.history[pack_categorie.name][1:],[None])
-                self.quantity_by_category[pack_categorie.name] = np.append(self.quantity_by_category[pack_categorie.name][1:],[0]) 
-                #Update the need (mean of quantity bought last HISTORY_LENGTH ticks)
-                self.needs[pack_categorie.name] = np.mean(reject_outliers(self.quantity_by_category[pack_categorie.name]))
+                self.history[pack_categorie.name] = np.append(self.history[pack_categorie.name][1:],[None])                            # Add in history None
+                self.quantity_by_category[pack_categorie.name] = np.append(self.quantity_by_category[pack_categorie.name][1:],[0])     # Add quantity 0
+                self.needs[pack_categorie.name] = np.mean(reject_outliers(self.quantity_by_category[pack_categorie.name]))             # Update the need
                 self.env.non_buyers[self.env.tick] += 1
                 if self.env.trace:
                     print("Pas de temps num : ",self.env.tick," Agent : ",self.name," Besoin", self.needs[pack_categorie.name]," Achat : Rien", "Quantité : 0")
             else: 
                 for pack in pack_categorie.pack_list:
-                    # If the pack is in state  a 3 buy 1 free for example.
+                    # If the pack is in state 3 buy 1 free for example.
                     if pack.special_promo_pack is not None:
                         utility, quantity = self.__compute_utility(pack.special_promo_pack, pack_categorie, dict_pack_freq)
                         # We add the base pack with the promoted pack for the compute of the number of this kind of pack bought 
                         # If pack.one_pack_quantity (ex: un paquet de pates de 800g) < quantity (je veux acheter 1kg)
-                        if pack.special_promo_pack.one_pack_quantity < quantity:
+                        if pack.special_promo_pack.one_pack_quantity < quantity:                                                       
                             possible_buy.append([(pack.special_promo_pack, pack), quantity, utility])
                     # We compute the utility of the pack 
                     utility, quantity = self.__compute_utility(pack,
                                                              pack_categorie,
                                                              dict_pack_freq)
-                    if pack.one_pack_quantity <= quantity:
-                        possible_buy.append([(pack,
+                    if pack.one_pack_quantity <= quantity:     # Check is the quantity wanted > the quantity of the pack
+                        possible_buy.append([(pack,            # Add 
                                               pack.special_promo_pack),
                                              quantity, utility])
                 if len(possible_buy) > 1:
@@ -543,7 +534,7 @@ class SMA:
                         self.packs_categories[tmp_promo[1]].pack_list[tmp_promo[2]].make_pack_promotion(tmp_promo[3][0],tmp_promo[3][1])
             tmp_reduce = self.reduce[i]
             if tmp_reduce != 0:
-                self.packs_categories[tmp_reduce[1]].pack_list[tmp_reduce[2]].reduce_price(tmp_reduce[0])
+                self.packs_categories[tmp_reduce[1]].pack_list[tmp_reduce[2]].reducePrice(tmp_reduce[0])
     
     def makePromo(self,p_type,quantity,ticks,category,pack):
         index = None
@@ -563,7 +554,7 @@ class SMA:
             self.promo[promo_type[2][0]] = (1,index,pack_index,quantity)
             self.promo[promo_type[2][0]] = (1,index,pack_index,0)
             
-    def reduce_price(self,percent, tick, cat ,prod):
+    def reducePrice(self,percent, tick, cat ,prod):
         self.reduce[tick] = (percent,cat,prod)
     
     def count_most_buy(self,category):
@@ -800,7 +791,7 @@ class Pack:
         if percentage == 0:
             self.is_promo = 0
             
-    def reduce_price(self, percentage):
+    def reducePrice(self, percentage):
         """
         percentage : int, between 0 and 100
         Update the promotion price and the attribute is_promo to
@@ -815,7 +806,7 @@ class Pack:
         self.lasts_price[1] = self.lasts_price[0]
         self.lasts_price[0] = self.promotion_price
         
-    def raise_price(self, percentage):
+    def raisePrice(self, percentage):
         """
         percentage : int, between 0 and 100
         Update the promotion price and the attribute is_promo to
