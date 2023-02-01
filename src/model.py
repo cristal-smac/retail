@@ -234,7 +234,7 @@ class Agent:
                 self.needs[pack_categorie.name] = np.mean(reject_outliers(self.quantity_by_category[pack_categorie.name]))             # Update the need
                 self.env.non_buyers[self.env.tick] += 1
                 if self.env.trace:
-                    print("Pas de temps num : ",self.env.tick," Agent : ",self.name," Besoin", self.needs[pack_categorie.name]," Achat : Rien", "Quantité : 0")
+                    print("ticks num : ",self.env.tick,", Agent : ",self.name,", Need : ", self.needs[pack_categorie.name],", Bought : None", ", Quantity : 0")
             else: 
                 for pack in pack_categorie.pack_list:
                     # If the pack is in state 3 buy 1 free for example.
@@ -281,7 +281,7 @@ class Agent:
                         # Update the need (mean of quantity bought last H_len ticks)
                         self.env.non_buyers[self.env.tick] += 1
                         if self.env.trace:
-                            print("Pas de temps num : ",self.env.tick," Agent : ",self.name," Besoin", self.needs[pack_categorie.name]," Achat : Rien", "Quantité : 0")
+                            print("ticks num : ",self.env.tick,", Agent : ",self.name,", Need : ", self.needs[pack_categorie.name],", Bought : None", ", Quantity : 0")
 
     def __compute_quantity(self, pack_category):
         moy = self.needs[pack_category.name]
@@ -391,7 +391,7 @@ class Agent:
             pack = pack[0]
         else:
             pack_to_incr = pack[1]
-            pack = pack[0]
+            pack = pack[0] 
         nb_pack_buy = int(quantity/pack.one_pack_quantity)
         if np.random.random() < (quantity/pack.one_pack_quantity - nb_pack_buy):
             nb_pack_buy += 1
@@ -409,7 +409,7 @@ class Agent:
         self.env.one_tick_sells_quantity += nb_pack_buy * pack.one_pack_quantity
         self.track_bought_to_plot[pack_categorie.name][self.env.tick] = (pack,nb_pack_buy *pack.one_pack_quantity)
         if self.env.trace:
-            print("Pas de temps num : ",self.env.tick," Agent : ",self.name," Besoin", self.needs[pack_categorie.name]," Achat : ", pack.name, "Quantité de pack: ",nb_pack_buy, " Quantité total: ",(nb_pack_buy *pack.one_pack_quantity)," ")
+            print("Ticks num : ",self.env.tick,", Agent : ",self.name,", Need :", self.needs[pack_categorie.name],", Bought : ", pack.name, ", Number of pack bought : ",nb_pack_buy, ", Total of units : ",(nb_pack_buy *pack.one_pack_quantity)," ")
         return 0
             
     
