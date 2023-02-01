@@ -1,5 +1,4 @@
 import numpy as np
-import numpy as np
 import matplotlib.pyplot as plt
 import seaborn as sns
 import math
@@ -13,9 +12,9 @@ def sigmoid(x):
 
 def H1(x, sigma=5, mu=10):
     if x < 10:
-        return 4* (((-(x)**2) + (20)*(x))/20) -2
+        return (4* (((-(x)**2) + (20)*(x))/20) -2) /10
     else:
-        return 8
+        return 8 / 10
 
 def prospect(x):
     if x<=0:
@@ -44,26 +43,26 @@ def reject_outliers(data, m = 300):
 
 
 def generate_price_sensibility():
-    return {"inertie":np.random.uniform(1,2,1),"price":np.random.uniform(10,21,1),
+    return {"inertia":np.random.uniform(1,2,1),"price":np.random.uniform(10,21,1),
             "quality":np.random.uniform(1,2,1),"promophile":np.random.uniform(1,2,1)}
             #,"jackpot":np.random.uniform(1,2,1),"advertising":np.random.uniform(1,2,1),"last_price":np.random.uniform(1,2,1)}
 
 def generate_quality_sensibility():
-    return {"inertie":np.random.uniform(1,2,1),"price":np.random.uniform(1,2,1),
+    return {"inertia":np.random.uniform(1,2,1),"price":np.random.uniform(1,2,1),
             "quality":np.random.uniform(10,21,1),"promophile":np.random.uniform(1,2,1)}
             #,"jackpot":np.random.uniform(1,2,1),"advertising":np.random.uniform(1,2,1),"last_price":np.random.uniform(1,2,1)}
 
 def generate_promophile_sensibility():
-    return {"inertie":np.random.uniform(1,2,1),"price":np.random.uniform(1,2,1),
+    return {"inertia":np.random.uniform(1,2,1),"price":np.random.uniform(1,2,1),
             "quality":np.random.uniform(1,2,1),"promophile":np.random.uniform(10,21,1)}
             #,"jackpot":np.random.uniform(1,2,1),"advertising":np.random.uniform(1,2,1),"last_price":np.random.uniform(1,2,1)}
 def generate_inertie_sensibility():
-    return {"inertie":np.random.uniform(10,21,1),"price":np.random.uniform(1,2,1),
+    return {"inertia":np.random.uniform(10,21,1),"price":np.random.uniform(1,2,1),
             "quality":np.random.uniform(1,2,1),"promophile":np.random.uniform(1,2,1)}
             #,"jackpot":np.random.uniform(1,2,1),"advertising":np.random.uniform(1,2,1),"last_price":np.random.uniform(1,2,1)}
 
 def generate_random_sensibility():
-    return {"inertie":np.random.uniform(1,2,1),"price":np.random.uniform(1,2,1),
+    return {"inertia":np.random.uniform(1,2,1),"price":np.random.uniform(1,2,1),
             "quality":np.random.uniform(1,2,1),"promophile":np.random.uniform(1,2,1)}
             #,"jackpot":np.random.uniform(1,2,1),"advertising":np.random.uniform(1,2,1),"last_price":np.random.uniform(1,2,1)}
     
@@ -123,7 +122,7 @@ class Profil:
         self.promo = sensibility["promophile"]/sum_s
         
     def getProfil(self):
-        return {"inertie":self.inertia,"price":self.price,
+        return {"inertia":self.inertia,"price":self.price,
             "quality":self.quality,"promophile":self.promo}
 
 class Agent:
@@ -190,8 +189,8 @@ class Agent:
             tmp_p = tmp_p / self.h_length
             tmp_q = tmp_q / self.h_length
             self.ref[pack_category.name] = Pack("ref",tmp_p,tmp_q,1)
+            self.ref[pack_category.name].set_norm(pack_category.pack_list)
 
-    
     def __get_pack_inertia(self,pack_category):
         dict_pack_freq = self.compute_freq_packs(pack_category)
         return max(dict_pack_freq)
@@ -349,9 +348,9 @@ class Agent:
         is_promo = 0
         if pack.is_promo == 1:
             is_promo = 1
-        threshold = ((self.sensibility["quality"]*(self.env.HP["QUALITY"]*(max(0, pack.quality-ref.quality)+self.env.HP["PHI"]*(max(0, ref.quality-pack.quality)))))+
-                     (self.sensibility["price"]*(self.env.HP["PRICE"]*(self.env.HP["PHI"] *max(0, (pack.promotion_price) -(ref.promotion_price)) +max(0, (ref.promotion_price) -(pack.promotion_price))))) +
-                     (self.sensibility["inertie"]*(inertie * self.env.HP["INERTIA"])) +
+        threshold = ((self.sensibility["quality"]*(self.env.HP["QUALITY"]*(max(0, pack.normQuality-ref.normQuality)+self.env.HP["PHI"]*(max(0, ref.normQuality-pack.normQuality)))))+
+                     (self.sensibility["price"]*(self.env.HP["PRICE"]*(self.env.HP["PHI"] *max(0, (pack.normPrice) -(ref.normPrice)) +max(0, (ref.normPrice) -(pack.normPrice))))) +
+                     (self.sensibility["inertia"]*(inertie * self.env.HP["INERTIA"])) +
                      (self.sensibility["promophile"]*(self.env.HP["PROMO_U"] * is_promo)))
         if threshold<0:
             threshold = 0
@@ -366,12 +365,11 @@ class Agent:
         threshold=float(threshold)
         return threshold, quantity
         
-    def ____compute_utility_ref(self,pack,dict_pack_freq):
-        ref = pack
-        U = ((self.sensibility["quality"] * (self.env.HP["QUALITY"]* (self.env.HP["PHI"]* max(0,pack.quality - ref.quality)+ (max(0,ref.quality-pack.quality))) ))+
-            (self.sensibility["price"] * (self.env.HP["PRICE"]* (self.env.HP["PHI"] *max(0,(pack.promotion_price) - (ref.promotion_price))+ max(0,(ref.promotion_price) - (pack.promotion_price))))) )#+
+    def ____compute_utility_ref(self,ref,dict_pack_freq):
+        U = ((self.sensibility["quality"] * (self.env.HP["QUALITY"]* (self.env.HP["PHI"]* max(0,pack.normQuality - ref.normQuality)+ (max(0,ref.normQuality-pack.normQuality))) ))+
+            (self.sensibility["price"] * (self.env.HP["PRICE"]* (self.env.HP["PHI"] *max(0,(pack.normPrice) - (ref.normPrice))+ max(0,(ref.normPrice) - (pack.normPrice))))) )#+
 #             (self.sensibility["last_price"] * (pack.promotion_price/pack.lasts_price[0]))+
-            #(self.sensibility["inertie"] * (inertie * self.env.HP["INERTIA"]))+
+            #(self.sensibility["inertia"] * (inertie * self.env.HP["INERTIA"]))+
 #            (self.sensibility["advertising"] * touched_by_ad)+
             #(self.sensibility["promophile"] * (self.env.HP["PROMO_U"] * pack.is_promo)))
         return U
@@ -401,6 +399,7 @@ class Agent:
         tmp_p = sum(i for i, j in self.history_price_quality[pack_categorie.name]) / self.h_length
         tmp_q = sum(j for i, j in self.history_price_quality[pack_categorie.name]) / self.h_length
         self.ref[pack_categorie.name] = Pack("ref",tmp_p,tmp_q,1)
+        self.ref[pack_categorie.name].set_norm(pack_categorie.pack_list)
         self.quantity_by_category[pack_categorie.name]=np.append(self.quantity_by_category[pack_categorie.name][1:],[nb_pack_buy * pack.one_pack_quantity])
         self.needs[pack_categorie.name] = np.mean(reject_outliers(self.quantity_by_category[pack_categorie.name]))
         self.inertie[pack_categorie.name][0] = pack
@@ -410,7 +409,7 @@ class Agent:
         self.env.one_tick_sells_quantity += nb_pack_buy * pack.one_pack_quantity
         self.track_bought_to_plot[pack_categorie.name][self.env.tick] = (pack,nb_pack_buy *pack.one_pack_quantity)
         if self.env.trace:
-            print("Pas de temps num : ",self.env.tick," Agent : ",self.name," Besoin", self.needs[pack_categorie.name]," Achat : ", pack.name, "Quantité : ",nb_pack_buy)
+            print("Pas de temps num : ",self.env.tick," Agent : ",self.name," Besoin", self.needs[pack_categorie.name]," Achat : ", pack.name, "Quantité de pack: ",nb_pack_buy, " Quantité total: ",(nb_pack_buy *pack.one_pack_quantity)," ")
         return 0
             
     
@@ -471,11 +470,12 @@ class SMA:
             res += i.pack_list
         return res
 
-    def initialise(self, price=0.5, quality=100, promophile=5, sat_alpha=100, phi=0.3, c = 2, inertia = 2):
+    def initialize(self, price=1, quality=1, promophile=2, sat_alpha=100, phi=0.3, c = 2, inertia = 2):
         self.tick = 0
         self.promo = [0] * self.HP["NB_TICKS"]
         self.most_buy= {}
         for category in self.packs_categories:
+            self.mean_needs[category.name] = []
             self.most_buy[category] = {}
             for p in category.pack_list:
                 self.most_buy[category][p.name] = []
@@ -532,9 +532,11 @@ class SMA:
                         self.packs_categories[tmp_promo[1]].pack_list[tmp_promo[2]].unmake_pack_promotion()
                     else:
                         self.packs_categories[tmp_promo[1]].pack_list[tmp_promo[2]].make_pack_promotion(tmp_promo[3][0],tmp_promo[3][1])
+                self.packs_categories[tmp_promo[1]].compute_normalized_price() # Data changed so we have to re-normalize
             tmp_reduce = self.reduce[i]
             if tmp_reduce != 0:
                 self.packs_categories[tmp_reduce[1]].pack_list[tmp_reduce[2]].reducePrice(tmp_reduce[0])
+                self.packs_categories[tmp_reduce[1]].compute_normalized_price() # Data changed so we have to re-normalize
     
     def makePromo(self,p_type,quantity,ticks,category,pack):
         index = None
@@ -636,6 +638,8 @@ class SMA:
             for pack in categorie.pack_list:
                 plt.plot(self.cumulative_nb_bought_per_pack[pack.name])
             plt.legend([pack.name for pack in categorie.pack_list])
+            plt.xlabel("Time step")
+            plt.ylabel("Sales quantity")
             plt.show()
         return 0
     
@@ -699,7 +703,10 @@ class SMA:
                 for k in list(res.keys()):
                     legendProduct += [k]
                     axs[profil].plot(res[k][profil])
-        axs[0].legend(legendProduct)
+        axs[0].legend(legendProduct,loc=1)
+        plt.xlabel("Time step")
+        plt.ylabel("Number of buyers")
+        plt.plot()
         
     
 class Category:
@@ -713,19 +720,33 @@ class Category:
         """
         self.name = name
         self.pack_list = pack_list
-        # self.mean_need_growth = mean_need_growth #Alpha
-#         self.mean_price = 0
-#         for i in pack_list:
-#             # We compute the mean price of the categorie to use it to check if a pack is cheaper than the other pack or more expensive.
-#             self.mean_price += (i.price/i.one_pack_quantity)
-#         self.mean_price = self.mean_price/len(pack_list)
-
+        if pack_list: # List not empty
+            self.compute_normalized_price()
+        else:
+            None
+    
+    def compute_normalized_price(self):
+        qual=[]
+        price=[]
+        for pack in self.pack_list:
+            qual += [pack.quality]
+            price+= [pack.promotion_price]
+        qual = np.array(qual)
+        price=np.array(price)
+        assert(qual.max()>0 and price.max()>0)
+        qual = [i/qual.max() for i in qual]  # Prix normalisés
+        price = [i/price.max() for i in price]# Qualités normalisés
+        for i in range(len(self.pack_list)):
+            self.pack_list[i].normPrice = price[i]
+            self.pack_list[i].normQuality = qual[i]
+        
     def addPack(self,one_pack):
         """
         one_pack: type pack. A pack to add at this category of pack. 
         This just add a new pack into this category. TODO find a way to avoid multiple same pack.
         """
         self.pack_list.insert(0,one_pack)
+        self.compute_normalized_price()
         return 0
         
     def getPacks(self):
@@ -733,7 +754,7 @@ class Category:
     
     def showPacks(self):
         for pack in self.pack_list:
-            print("Nom : ",pack.getName(), ", Prix total : ",pack.getTotalPrice())
+            print("Name : ",pack.getName(), ", Total price : ",pack.getTotalPrice())
         return 0
 
 
@@ -759,21 +780,36 @@ class Pack:
         self.name = name
         self.is_promo = 0
         self.promotion_price = price
-        self.lasts_price = [price,price,price] #On enregsitre les 3 denières valeurs.
-        self.price = price #Price 1 pack (price for 1 unit * one_pack_quantity)
+        self.lasts_price = [price,price,price] # On enregsitre les 3 denières valeurs.
+        self.price = price # Unit price
         self.quality = quality
-        self.percent_packpot = 0 #How much % is rewarded on the jackpot of the consumer. To calibrate with real data.
+        self.percent_packpot = 0 # How much % is rewarded on the jackpot of the consumer. To calibrate with real data.
         self.one_pack_quantity = one_pack_quantity
         self.pack_price = one_pack_quantity * price
         self.pack_ad = 0 # Between 0 and 1, 1 everybody is touched by the ad, 0 nobody. 0.5 mean 50%
         self.nb_bought = 0
         self.special_promo_pack = None 
+        self.normPrice = 0
+        self.normQuality = 0
     
     def __str__(self):
         return self.name
     
     def __repr__(self):
         return self.name
+    
+    def set_norm(self,packs):
+        qual=[]
+        price=[]
+        for pack in packs:
+            qual += [pack.quality]
+            price+= [pack.promotion_price]
+        qual = np.array(qual)
+        price=np.array(price)
+        assert(price.max()>0 and qual.max()>0)
+        self.normQuality = (self.quality) / (qual.max())
+        self.normPrice = (self.promotion_price) / (price.max())
+       
 
     def simplePromotion(self, percentage):
         """
