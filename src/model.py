@@ -278,10 +278,10 @@ class Agent:
         """
         This is used to simulate an agent going to the supermarket.
         For each category of pack the agent have to choose 1 pack to buy.
-        To do that it compute a threshold, and compare it's needs to this threshold.
-        If it's needs >= threshold he consider this pack. Then when th agent have
-        all the pack it considers. It choose the pack with the min
-        threshold/one_pack_quantity.
+        To do that it compute a threshold, and compare it's needs to this 
+        threshold. If it's needs >= threshold he consider this pack. Then
+        when th agent have all the pack it considers. It choose the pack 
+        with the min threshold/one_pack_quantity.
         The one_pack_quantity coresponding to the number of pack in the pack.
         """
         for pack_categorie in self.env.packs_categories:
@@ -418,12 +418,13 @@ class Agent:
                           dict_pack_freq,
                           seconde_pack=None):
         """
-        For this agent, this function computes his opinion of the pack in parameters.
-        Using the sensibilities of the agent we compute a "threshold" (à changer de nom)
-        using sum(sensibility_i * pack_attribut_corresponding).
-        This function is principaly used to know which pack is the most suitable for this agent
-        comparing to the others pack of the category this agent considers.
-        The agent choose considering pack in the go_store decision function.
+        For this agent, this function computes his opinion of the pack in
+        parameters. Using the sensibilities of the agent we compute a 
+        "threshold" using sum(sensibility_i * pack_attribut_corresponding).
+        This function is principaly used to know which pack is the most 
+        suitable for this agent comparing to the others pack of the category
+        this agent considers. The agent choose considering pack in the 
+        go_store decision function.
         """
         # Check the most bought pack. (Le produit de référence)
         # Il n'y a besoin de calculer ref qu'une seul fois,
@@ -592,7 +593,7 @@ class SMA:
             res += i.pack_list
         return res
 
-    def initialize(self, price=1, quality=1,
+    def initialize(self, price=3, quality=3,
                    promophile=2, sat_alpha=10,
                    phi=0.3, c=2, inertia=2):
         self.tick = 0
@@ -684,7 +685,7 @@ class SMA:
             self.promo[p_type[2][0]] = (1, index, pack_index, quantity)
             self.promo[p_type[2][0]] = (1, index, pack_index, 0)
 
-    def reducePrice(self, percent, tick, cat ,prod):
+    def reducePrice(self, percent, tick, cat, prod):
         self.reduce[tick] = (percent, cat, prod)
 
     def count_most_buy(self, category):
@@ -794,9 +795,16 @@ class SMA:
         return res
 
     def getTurnover(self):
+        """
+        return:, list of int, the turnover at each time step.
+        """
         return self.revenues
 
     def showProfileSales(self):
+        """
+        For each profile plot  the number of buyers of the 3 first produdcts
+        in the category over time using the matplolib library
+        """
         # Création d'une map avec comme clé Produit et Profil 
         # et comme valeur les achats des profils sur ce produit.
         res = {}
@@ -805,7 +813,7 @@ class SMA:
                 res[pack.name] = {}
                 for profiles in range(5):
                     res[pack.name][profiles] = [0]*self.HP["NB_TICKS"]
-        # Parcours des agents. Ajout de leurs ahcats dans la map selon leurs profils
+        # Ajout des achats dans la map selon les profils d'agents
         for agent in self.agents:
             for cat in self.packs_categories:
                 cpt  =0
@@ -1026,7 +1034,7 @@ class Pack:
         will make a 30% promotion on this pack.
         """
         promo = self.price / self.promotion_price
-        self.price = self.price * (1 - (percentage/100))
+        self.price = self.price * (1 + (percentage/100))
         self.promotion_price = self.price / promo
         self.pack_price = self.promotion_price * self.one_pack_quantity
         self.lasts_price[2] = self.lasts_price[1]
