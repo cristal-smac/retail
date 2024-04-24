@@ -30,13 +30,13 @@ plt.plot(results)
 
 "_GetStarted_" notebook is a presentation of the model, all the posible methods and how to use it. This notebook is made to understand parameters of the model and agents and how to use those parameters properly. You can launch this notebook directly with the following link :
 
-FR : [![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/cristal-smac/retail/SupermarketModel.git/master?filepath=FR_GetStarted.ipynb) EN : [![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/cristal-smac/retail/SupermarketModel.git/master?filepath=ENG_GetStarted.ipynb)
+FR : [![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/cristal-smac/retail.git/master/SupermarketModel?filepath=FR_GetStarted.ipynb) EN : [![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/cristal-smac/retail.git/master/SupermarketModel?filepath=ENG_GetStarted.ipynb)
 
 ### Experiments
 
 "_Experiments_" notebook contains the various simulations presented in the article, with a fixed random seed to reproduce the same results. You can launch this notebook directly with the following link :
 
-FR : [![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/cristal-smac/retail/SupermarketModel.git/master?filepath=FR_Experiments.ipynb) EN : [![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/cristal-smac/retail/SupermarketModel.git/master?filepath=ENG_Experiments.ipynb)
+FR : [![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/cristal-smac/retail.git/master/SupermarketModel?filepath=FR_Experiments.ipynb) EN : [![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/cristal-smac/retail.git/master/SupermarketModel?filepath=ENG_Experiments.ipynb)
 
 ***
 
