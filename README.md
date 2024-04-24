@@ -4,7 +4,7 @@ This repository contain a simulator of price dynamics and is made to contain too
 
 Team : CRISTAL Lab, SMAC team, Lille University
 
-Company : fifty-five
+Company : fifty-five, 5-7 rue d'Athènes, Paris
 
 Contact : jarod.vanderlynden@fifty-five.com, philippe.mathieu@univ-lille.fr, romain@fifty-five.com
 
@@ -12,33 +12,9 @@ Contact : jarod.vanderlynden@fifty-five.com, philippe.mathieu@univ-lille.fr, rom
 
 ## Price dynamics, simulate discounts in a store
 
-This section is dedicated to the model presented in the article "_Understanding the impact of pricing strategies on consumer behavior_". 
+The code and notebooks found in the "SupermarketModel" folder are dedicated to the model presented in the article "_Simulation of consumers behavior facing discounts and promotions_", presented in ICAART, and "_Understanding the Impact of Promotions on Consumer Behavior_" extended abstract AAMAS, in french "__" JFSMA, extended version "__" in ROIA.
 
-### Quick start
-	
-```python
-from src.model import *
-import matplotlib.pyplot as plt
-cat_0 = ProductsCategorie("catégorie 0",[Product("Produit_A", 10, 0.5, 1), Product("Produit_B", 12, 0.7, 1)])
-sma = SMA([cat_0],300,10)
-sma.initialise()
-sma.run()
-results = env.get_favorites()
-plt.plot(results)
-```
-### Get started
+## Decoy effect and context effects
 
-"_GetStarted_" notebook is a presentation of the model, all the posible methods and how to use it. This notebook is made to understand parameters of the model and agents and how to use those parameters properly. You can launch this notebook directly with the following link :
-
-FR : [![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/cristal-smac/retail.git/master?filepath=FR_GetStarted.ipynb) EN : [![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/cristal-smac/retail.git/master?filepath=ENG_GetStarted.ipynb)
-
-### Experiments
-
-"_Experiments_" notebook contains the various simulations presented in the article, with a fixed random seed to reproduce the same results. You can launch this notebook directly with the following link :
-
-FR : [![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/cristal-smac/retail.git/master?filepath=FR_Experiments.ipynb) EN : [![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/cristal-smac/retail.git/master?filepath=ENG_Experiments.ipynb)
-
-"_BUILDING_" notebook presents a bunch of different possible simulations and the outcome of the model. The aim is to present interesting simulations to show what the model can do. 
-
-***
+The code and notebooks found in the "DecoyEffect" folder are dedicated to the work presented in the article in french "_Stratégies marketing et effets de contexte_". 
 
