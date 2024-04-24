@@ -12,7 +12,7 @@ Contact : jarod.vanderlynden@fifty-five.com, philippe.mathieu@univ-lille.fr, rom
 
 ## Price dynamics, simulate discounts in a store
 
-This section is dedicated to the model presented in the article "_Understanding the impact of pricing strategies on consumer behavior_". 
+This section is dedicated to the model presented in the article "_Simulation of consumers behavior facing discounts and promotions_", presented in ICAART, and "_Understanding the Impact of Promotions on Consumer Behavior_" extended abstract AAMAS, in french "_Comprendre l'impact des stratégies de prix sur le comportement des consommateurs_" JFSMA, extended version "_Impact des stratégies de prix sur les consommateurs_" in ROIA.
 
 ### Quick start
 	
@@ -30,15 +30,13 @@ plt.plot(results)
 
 "_GetStarted_" notebook is a presentation of the model, all the posible methods and how to use it. This notebook is made to understand parameters of the model and agents and how to use those parameters properly. You can launch this notebook directly with the following link :
 
-FR : [![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/cristal-smac/retail.git/master?filepath=FR_GetStarted.ipynb) EN : [![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/cristal-smac/retail.git/master?filepath=ENG_GetStarted.ipynb)
+FR : [![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/cristal-smac/retail/SupermarketModel.git/master?filepath=FR_GetStarted.ipynb) EN : [![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/cristal-smac/retail/SupermarketModel.git/master?filepath=ENG_GetStarted.ipynb)
 
 ### Experiments
 
 "_Experiments_" notebook contains the various simulations presented in the article, with a fixed random seed to reproduce the same results. You can launch this notebook directly with the following link :
 
-FR : [![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/cristal-smac/retail.git/master?filepath=FR_Experiments.ipynb) EN : [![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/cristal-smac/retail.git/master?filepath=ENG_Experiments.ipynb)
-
-"_BUILDING_" notebook presents a bunch of different possible simulations and the outcome of the model. The aim is to present interesting simulations to show what the model can do. 
+FR : [![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/cristal-smac/retail/SupermarketModel.git/master?filepath=FR_Experiments.ipynb) EN : [![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/cristal-smac/retail/SupermarketModel.git/master?filepath=ENG_Experiments.ipynb)
 
 ***
 

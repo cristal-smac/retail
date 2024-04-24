@@ -12,7 +12,7 @@ Contact : jarod.vanderlynden@fifty-five.com, philippe.mathieu@univ-lille.fr, rom
 
 ## Price dynamics, simulate discounts in a store
 
-The code and notebooks found in the "SupermarketModel" folder are dedicated to the model presented in the article "_Simulation of consumers behavior facing discounts and promotions_", presented in ICAART, and "_Understanding the Impact of Promotions on Consumer Behavior_" extended abstract AAMAS, in french "__" JFSMA, extended version "__" in ROIA.
+The code and notebooks found in the "SupermarketModel" folder are dedicated to the model presented in the article "_Simulation of consumers behavior facing discounts and promotions_", presented in ICAART, and "_Understanding the Impact of Promotions on Consumer Behavior_" extended abstract AAMAS, in french "_Comprendre l'impact des stratégies de prix sur le comportement des consommateurs_" JFSMA, extended version "_Impact des stratégies de prix sur les consommateurs_" in ROIA.
 
 ## Decoy effect and context effects
 
