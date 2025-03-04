@@ -16,5 +16,10 @@ The code and notebooks found in the "SupermarketModel" folder are dedicated to t
 
 ## Decoy effect and context effects
 
-The code and notebooks found in the "DecoyEffect" folder are dedicated to the work presented in the article in french "_Stratégies marketing et effets de contexte_". 
+Le code et notebooks du repository "DecoyEffect" sont dédiés aux travaux présentés aux JFSMA 2024 dans l'article "_Stratégies marketing et effets de contexte_" et aux travaux soumis aux JFSMA 2025 dans l'article "_Calibration d’un Système Multi-Agent pour l’Optimisation des Prix de Produits Concurrentiels_".
+
+The code and notebooks found in the "DecoyEffect" folder are dedicated to the work presented in the article in french "_Stratégies marketing et effets de contexte_".
+
+
+
 
