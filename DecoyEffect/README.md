@@ -17,7 +17,7 @@ Contact : jarod.vanderlynden@fifty-five.com, philippe.mathieu@univ-lille.fr, rom
 
 FR : [![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/cristal-smac/retail.git/main?filepath=DecoyEffect/FR_Get_Started_Decoy_Effect.ipynb) EN : [![Binder](https://mybinder.org/badge_logo.svg)]()
 
-### Calibration 
+### Calibration (JFSMA 2025)
 
 "_Calibration_" notebook is a presentation of our calibration method using real data. This notebook is made to understand our calibration method and how to replicate our results.
 
