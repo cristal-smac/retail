@@ -19,6 +19,6 @@ FR : [![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh
 
 ### Calibration (JFSMA 2025)
 
-"_Calibration_" notebook is a presentation of our calibration method using real data. This notebook is made to understand our calibration method and how to replicate our results.
+"_DemoJFSMA2025_" notebook is a presentation of our calibration method using real data. This notebook is made to understand our calibration method and how to replicate our results.
 
-Le notebook "_Calibration_" présente nos tavaux sur la calibration et comment répliquer les résultats. Ce notebook permet de répliquer les résultats présentés dans l'article "_Calibration d’un Système Multi-Agent pour l’Optimisation des Prix de Produits Concurrentiels_" soumis aux JFSMA 2025
+Le notebook "_DemoJFSMA2025_" présente nos tavaux sur la calibration et comment répliquer les résultats. Ce notebook permet de répliquer les résultats présentés dans l'article "_Calibration d’un Système Multi-Agent pour l’Optimisation des Prix de Produits Concurrentiels_" soumis aux JFSMA 2025
