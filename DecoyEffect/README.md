@@ -13,7 +13,7 @@ Contact : jarod.vanderlynden@fifty-five.com, philippe.mathieu@univ-lille.fr, rom
 
 ### Get started
 
-"_GetStarted_Decoy_effect_" notebook is a presentation of the model, all the posible methods and how to use it. This notebook is made to understand parameters of the model and agents and how to use those parameters properly. You can launch this notebook directly with the following link :
+"_GetStarted_Decoy_effect_" notebook is a presentation of the model and methods and how to use it. This notebook is made to understand parameters of the model and agents and how to use those parameters properly. You can launch this notebook directly with the following link :
 
 FR : [![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/cristal-smac/retail.git/main?filepath=DecoyEffect/FR_Get_Started_Decoy_Effect.ipynb) EN : [![Binder](https://mybinder.org/badge_logo.svg)]()
 
